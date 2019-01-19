@@ -1,0 +1,7 @@
+#!/bin/sh
+sudo mkdir /etc/ybacklight
+ls /sys/class/backlight | grep intel
+echo please select your backlight
+read backlight
+sudo sh -c "echo /sys/class/backlight/$backlight/ > /etc/ybacklight/dir.conf"
+sudo cp ybacklight /bin/ybacklight
