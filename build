@@ -1,2 +1,3 @@
 #!/bin/sh
 gcc main.c -O3 -o ybacklight
+chmod +s ybacklight

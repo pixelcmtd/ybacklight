@@ -44,6 +44,8 @@ void write_brightness(char *dir, long i)
 	strcat(c, "brightness");
 	char bfr[32];
 	sprintf(bfr, "%ld\n", i);
+	uid_t uid = getuid();
+	setuid(0);
 	FILE *f = fopen(c, "w");
 	if(!f)
 	{
@@ -52,4 +54,5 @@ void write_brightness(char *dir, long i)
 	}
 	fwrite(bfr, 1, 32, f);
 	fclose(f);
+	setuid(uid);
 }
