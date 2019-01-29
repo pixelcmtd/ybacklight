@@ -1,3 +1,3 @@
 #!/bin/sh
-sudo gcc main.c -O3 -o ybacklight
+sudo gcc ybacklight.c -O3 -o ybacklight
 sudo chmod +s ybacklight
