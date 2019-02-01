@@ -2,12 +2,6 @@
 A complete rewrite of xbacklight that actually works.
 # Requirements
 * A recent version of Linux (2.4.10+)
-* GCC
-# Building
-Just run `./build` and enter your root password.
+* A monitor with a software-controllable backlight
 # Installing
-* GOTO Building
-* Run `./install`
-* Type in your root password
-* Select your backlight from the list
-* Done
+curl -L -o - https://github.com/chrissxYT/ybacklight/blob/master/installer.sh | sh
