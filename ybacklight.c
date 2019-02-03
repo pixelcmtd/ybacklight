@@ -50,7 +50,7 @@ void write_brightness(char *dir, long i)
 			printf(", setting the UID failed: %s\n",
 					strerror(en));
 		else
-			printf("...I don't know, can't open because errno: %s\n",
+			printf("...I don't know, can't open, errno: %s\n",
 					strerror(errno));
 		return;
 	}
