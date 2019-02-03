@@ -5,3 +5,4 @@ echo please select your backlight
 read backlight
 sudo sh -c "echo /sys/class/backlight/$backlight/ > /etc/ybacklight/dir.conf"
 sudo cp ybacklight /bin/ybacklight
+sudo chmod +s /bin/ybacklight
