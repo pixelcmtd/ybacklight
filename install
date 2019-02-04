@@ -1,6 +1,6 @@
 #!/bin/sh
 sudo mkdir /etc/ybacklight
-ls /sys/class/backlight | grep intel
+ls /sys/class/backlight
 echo please select your backlight
 read backlight
 sudo sh -c "echo /sys/class/backlight/$backlight/ > /etc/ybacklight/dir.conf"
