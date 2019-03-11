@@ -1,7 +1,4 @@
-#define CONFIG "/etc/ybacklight/dir.conf"
-#define MAX_CFG_LEN 1024
-#define NUM_MAX 16
-
+#include "config.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
@@ -9,78 +6,57 @@
 #include <stdlib.h>
 #include <errno.h>
 
-void load_config(char *bfr)
+#define USAGE puts("cur, max, inc [long], dec [long] or set [long]")
+
+void die(char *msg1, char *msg2)
 {
-	FILE *f = fopen(CONFIG, "r");
-	size_t i = fread(bfr, 1, MAX_CFG_LEN, f) - 1;
-	fclose(f);
-	if(bfr[i] == '\n')
-		bfr[i] = '\0';
+	printf(msg1, msg2);
+	exit(1);
 }
 
-long br_read(char *dir, char *fname)
+long br_read(char *fname)
 {
-	char c[MAX_CFG_LEN + 16];
-	strcpy(c, dir);
-	strcat(c, fname);
 	char bfr[NUM_MAX];
-	FILE *f = fopen(c, "r");
+	FILE *f = fopen(fname, "r");
 	size_t i = fread(bfr, 1, NUM_MAX, f) - 1;
 	fclose(f);
-	if(bfr[i] == '\n')
-		bfr[i] = '\0';
+	if(bfr[i] == '\n') bfr[i] = '\0';
 	return strtol(bfr, 0, 10);
 }
 
-void write_brightness(char *dir, long i)
+void write_brightness(long i)
 {
-	char c[2048];
-	strcpy(c, dir);
-	strcpy(c+strlen(dir), "brightness");
 	char bfr[NUM_MAX];
-	sprintf(bfr, "%ld\n", i);
+	size_t cnt = sprintf(bfr, "%ld\n", i);
 	uid_t uid = getuid();
-	int j = setuid(0); //root
-	int en = errno;
-	FILE *f = fopen(c, "w");
+	if(setuid(0))
+		die("Setting the UID failed: %s\n", strerror(errno));
+	FILE *f = fopen(BRIGHTNESS, "w");
 	if(!f)
-	{
-		printf("No privileges");
-		if(j)
-			printf(", setting the UID failed: %s\n",
-					strerror(en));
-		else
-			printf("...I don't know, can't open, errno: %s\n",
-					strerror(errno));
-		return;
-	}
-	fwrite(bfr, 1, strlen(bfr), f);
+		die("Can't open file failed: %s\n", strerror(errno));
+	fwrite(bfr, 1, cnt, f);
 	fclose(f);
 	setuid(uid);
 }
 
+#ifndef YBACKLIGHT_LIB
 int main(int argc, char **argv)
 {
-	char dir[MAX_CFG_LEN];
-	load_config(dir);
-	long i = br_read(dir, "brightness");
-	long j = br_read(dir, "max_brightness");
-	if(argc < 2)
-		printf("%ld/%ld\n", i, j);
+	long i = br_read(BRIGHTNESS);
+	long j = br_read(MAX_BRIGHTNESS);
+	if(argc < 2) printf("%ld/%ld\n", i, j);
 	else if(argc == 2)
 	{
-		if(!strcmp(argv[1], "cur"))
-			printf("%ld\n", i);
-		else if(!strcmp(argv[1], "max"))
-			printf("%ld\n", j);
-		else
-			puts("cur, max, inc [long], dec [long] or set [long]");
+		if(!strcmp(argv[1], "cur"))      printf("%ld\n", i);
+		else if(!strcmp(argv[1], "max")) printf("%ld\n", j);
+		else 				 USAGE;
 	}
 	else if(!strcmp(argv[1], "inc"))
-		write_brightness(dir, i + strtol(argv[2], 0, 0));
+		write_brightness(i + strtol(argv[2], 0, 0));
 	else if(!strcmp(argv[1], "dec"))
-		write_brightness(dir, i - strtol(argv[2], 0, 0));
+		write_brightness(i - strtol(argv[2], 0, 0));
 	else if(!strcmp(argv[1], "set"))
-		write_brightness(dir, strtol(argv[2], 0, 0));
-	return 0;
+		write_brightness(strtol(argv[2], 0, 0));
+	else USAGE;
 }
+#endif

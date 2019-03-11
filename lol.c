@@ -3,14 +3,11 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#define YBACKLIGHT_LIB
+#include "ybacklight.c"
 
 int main()
 {
 	srand(time(0));
-	char bfr[50];
-	while(1)
-	{
-		sprintf(bfr, "ybacklight set %d", rand() % MAX);
-		system(bfr);
-	}
+	while(1) write_brightness(rand() % MAX);
 }
