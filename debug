@@ -1,3 +1,0 @@
-#!/bin/sh
-gcc ybacklight.c -Og -fsanitize=address -Wall -Wextra -o ybacklight
-./ybacklight

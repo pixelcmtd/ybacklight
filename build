@@ -1,3 +1,0 @@
-#!/bin/sh
-sudo gcc ybacklight.c -O3 -o ybacklight
-sudo chmod +s ybacklight
