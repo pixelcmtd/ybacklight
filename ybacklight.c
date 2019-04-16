@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define USAGE puts("cur, max, inc [long], dec [long] or set [long]")
+#define USAGE() puts("cur, max, inc [long], dec [long] or set [long]")
 
 void die(char *msg1, char *msg2)
 {
@@ -29,14 +29,12 @@ void write_brightness(long i)
 	char bfr[NUM_MAX];
 	size_t cnt = sprintf(bfr, "%ld\n", i);
 	uid_t uid = getuid();
-	if(setuid(0))
-		die("Setting the UID failed: %s\n", strerror(errno));
+	if(setuid(0)) die("Can't set UID: %s\n", strerror(errno));
 	FILE *f = fopen(BRIGHTNESS, "w");
-	if(!f)
-		die("Can't open file failed: %s\n", strerror(errno));
+	if(!f) die("Can't open file: %s\n", strerror(errno));
 	fwrite(bfr, 1, cnt, f);
 	fclose(f);
-	setuid(uid);
+	if(setuid(uid)) die("Can't set UID: %s\n", strerror(errno));
 }
 
 #ifndef YBACKLIGHT_LIB
@@ -47,16 +45,16 @@ int main(int argc, char **argv)
 	if(argc < 2) printf("%ld/%ld\n", i, j);
 	else if(argc == 2)
 	{
-		if(!strcmp(argv[1], "cur"))      printf("%ld\n", i);
-		else if(!strcmp(argv[1], "max")) printf("%ld\n", j);
-		else 				 USAGE;
+		     if(*argv[1] == 'c') printf("%ld\n", i);
+		else if(*argv[1] == 'm') printf("%ld\n", j);
+		else 				 USAGE();
 	}
-	else if(!strcmp(argv[1], "inc"))
+	else if(*argv[1] == 'i')
 		write_brightness(i + strtol(argv[2], 0, 0));
-	else if(!strcmp(argv[1], "dec"))
+	else if(*argv[1] == 'd')
 		write_brightness(i - strtol(argv[2], 0, 0));
-	else if(!strcmp(argv[1], "set"))
+	else if(*argv[1] == 's')
 		write_brightness(strtol(argv[2], 0, 0));
-	else USAGE;
+	else USAGE();
 }
 #endif
