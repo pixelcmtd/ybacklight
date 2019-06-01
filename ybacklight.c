@@ -53,9 +53,9 @@ void run(char cmd, bool *S, struct display *d, long arg, bool *w)
 		case 'c': printf("%ld", *S ? d->cur / 100 : d->cur); *w = 1; break;
 		case 'm': printf("%ld", *S ? d->max / 100 : d->max); *w = 1; break;
 		case 'S': *S = 1; return;
-		case 'i': d->cur += arg; break;
-		case 'd': d->cur -= arg; break;
-		case 's': d->cur  = arg; break;
+		case 'i': d->cur += *S ? arg * 100 : arg; break;
+		case 'd': d->cur -= *S ? arg * 100 : arg; break;
+		case 's': d->cur  = *S ? arg * 100 : arg; break;
 		default:  putchar(cmd); *w = 1; break;
 	}
 	*S = 0;
