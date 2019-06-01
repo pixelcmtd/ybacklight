@@ -9,5 +9,5 @@
 int main()
 {
 	srand(time(0));
-	while(1) write_brightness(rand() % MAX);
+	while(1) write_brightness(rand() % MAX), usleep(100000);
 }
