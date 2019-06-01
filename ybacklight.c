@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-
-#define USAGE() puts("c[ur]/S[hort]/m[ax]/i[nc]/d[ec]/s[et]")
+#define parsenum(bfr) strtol((bfr), 0, 10)
+#define isnum(c) (c) >= '0' && (c) <= '9'
 
 void die(char *msg1, char *msg2)
 {
@@ -18,10 +18,9 @@ long br_read(char *fname)
 {
 	char bfr[NUM_MAX];
 	FILE *f = fopen(fname, "r");
-	size_t i = fread(bfr, 1, NUM_MAX, f) - 1;
+	bfr[fread(bfr, 1, NUM_MAX, f) - 1] = '\0';
 	fclose(f);
-	if(bfr[i] == '\n') bfr[i] = '\0';
-	return strtol(bfr, 0, 10);
+	return parsenum(bfr);
 }
 
 void write_brightness(long i)
@@ -65,33 +64,27 @@ int main(int argc, char **argv)
 	struct display d;
 	d.cur = br_read(BRIGHTNESS);
 	d.max = br_read(MAX_BRIGHTNESS);
-	char c;
-	char q = 0; //queued
+	char c, numbuf[NUM_MAX], q /*queued*/ = 0;
 	long a = -1;
-	bool S = 0;
-	char numbuf[NUM_MAX];
+	bool S = 0, w = 0;
 	memset(numbuf, 0, NUM_MAX);
-	bool w = 0;
 	for(int i = 1; i < argc; i++)
 	{
 		char *cp = argv[i];
 		while((c = *cp++))
-			if(c >= '0' && c <= '9')
-				numbuf[strlen(numbuf)] = c;
+			if(isnum(c)) numbuf[strlen(numbuf)] = c;
 			else
 			{
 				if(strlen(numbuf))
-					a = strtol(numbuf, 0, 10),
+					a = parsenum(numbuf),
 					memset(numbuf, 0, NUM_MAX);
 				if(q) run(q, &S, &d, a, &w), q = 0;
-				if((c == 's' || c == 'd' || c == 'i') &&
-				   *(cp+1) >= '0' && *(cp+1) <= '9')
-					q = c;
+				if((c == 's' || c == 'd' || c == 'i')
+				   && isnum(*(cp + 1))) q = c;
 				else run(c, &S, &d, a, &w);
 			}
 	}
-	if(strlen(numbuf) && q)
-		run(q, &S, &d, strtol(numbuf, 0, 10), &w);
+	if(strlen(numbuf) && q) run(q, &S, &d, parsenum(numbuf), &w);
 	if(w) putchar('\n');
 	write_brightness(d.cur);
 	return 0;
