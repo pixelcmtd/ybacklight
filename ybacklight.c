@@ -7,6 +7,11 @@
 #include <errno.h>
 #define parsenum(bfr) strtol((bfr), 0, 10)
 #define isnum(c) (c) >= '0' && (c) <= '9'
+#if DEBUG
+#define debug(f, a) printf(f, a)
+#else
+#define debug(f, a)
+#endif
 
 void die(char *msg1, char *msg2)
 {
@@ -40,30 +45,26 @@ void write_brightness(long i)
 #ifndef bool
 typedef int bool;
 #endif
-struct display
+void run(char cmd, bool *S, long *cur, long *max, long arg, bool *w)
 {
-	long cur;
-	long max;
-};
-void run(char cmd, bool *S, struct display *d, long arg, bool *w)
-{
+	debug("Cmd: %c; ", cmd);
+	debug("Short: %d\n", *S);
 	switch(cmd)
 	{
-		case 'c': printf("%ld", *S ? d->cur / 100 : d->cur); *w = 1; break;
-		case 'm': printf("%ld", *S ? d->max / 100 : d->max); *w = 1; break;
+		case 'c': printf("%ld", *S ? *cur / 100 : *cur); *w = 1; break;
+		case 'm': printf("%ld", *S ? *max / 100 : *max); *w = 1; break;
 		case 'S': *S = 1; return;
-		case 'i': d->cur += *S ? arg * 100 : arg; break;
-		case 'd': d->cur -= *S ? arg * 100 : arg; break;
-		case 's': d->cur  = *S ? arg * 100 : arg; break;
+		case 'i': *cur += *S ? arg * 100 : arg; break;
+		case 'd': *cur -= *S ? arg * 100 : arg; break;
+		case 's': *cur  = *S ? arg * 100 : arg; break;
 		default:  putchar(cmd); *w = 1; break;
 	}
 	*S = 0;
 }
 int main(int argc, char **argv)
 {
-	struct display d;
-	d.cur = br_read(BRIGHTNESS);
-	d.max = br_read(MAX_BRIGHTNESS);
+	long cur = br_read(BRIGHTNESS);
+	long max = br_read(MAX_BRIGHTNESS);
 	char c, numbuf[NUM_MAX], q /*queued*/ = 0;
 	long a = -1;
 	bool S = 0, w = 0;
@@ -78,15 +79,15 @@ int main(int argc, char **argv)
 				if(strlen(numbuf))
 					a = parsenum(numbuf),
 					memset(numbuf, 0, NUM_MAX);
-				if(q) run(q, &S, &d, a, &w), q = 0;
+				if(q) run(q, &S, &cur, &max, a, &w), q = 0;
 				if((c == 's' || c == 'd' || c == 'i')
 				   && isnum(*(cp + 1))) q = c;
-				else run(c, &S, &d, a, &w);
+				else run(c, &S, &cur, &max, a, &w);
 			}
 	}
-	if(strlen(numbuf) && q) run(q, &S, &d, parsenum(numbuf), &w);
+	if(strlen(numbuf) && q) run(q, &S, &cur, &max, parsenum(numbuf), &w);
 	if(w) putchar('\n');
-	write_brightness(d.cur);
+	write_brightness(cur);
 	return 0;
 }
 #endif
