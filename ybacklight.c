@@ -51,12 +51,12 @@ void run(char cmd, bool *S, long *cur, long *max, long arg, bool *w)
 	debug("Short: %d\n", *S);
 	switch(cmd)
 	{
-		case 'c': printf("%ld", *S ? *cur / 100 : *cur); *w = 1; break;
-		case 'm': printf("%ld", *S ? *max / 100 : *max); *w = 1; break;
+		case 'c': printf("%ld", *S ? *cur / SHORT_FACTOR : *cur); *w = 1; break;
+		case 'm': printf("%ld", *S ? *max / SHORT_FACTOR : *max); *w = 1; break;
 		case 'S': *S = 1; return;
-		case 'i': *cur += *S ? arg * 100 : arg; break;
-		case 'd': *cur -= *S ? arg * 100 : arg; break;
-		case 's': *cur  = *S ? arg * 100 : arg; break;
+		case 'i': *cur += *S ? arg * SHORT_FACTOR : arg; break;
+		case 'd': *cur -= *S ? arg * SHORT_FACTOR : arg; break;
+		case 's': *cur  = *S ? arg * SHORT_FACTOR : arg; break;
 		default:  putchar(cmd); *w = 1; break;
 	}
 	*S = 0;
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 			if(isnum(c)) numbuf[strlen(numbuf)] = c;
 			else
 			{
-				if(strlen(numbuf))
+				if(*numbuf)
 					a = parsenum(numbuf),
 					memset(numbuf, 0, NUM_MAX);
 				if(q) run(q, &S, &cur, &max, a, &w), q = 0;

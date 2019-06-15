@@ -1,3 +1,4 @@
+#!/bin/sh
 sudo make debug
 sudo chmod +s ybacklight
 ./ybacklight Sc/Sm
