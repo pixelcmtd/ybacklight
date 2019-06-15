@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#define parsenum(bfr) strtol((bfr), 0, 10)
-#define isnum(c) (c) >= '0' && (c) <= '9'
+#define parsenum(bfr) (strtol((bfr), 0, 10))
+#define isnum(c) ((c) >= '0' && (c) <= '9')
 #if DEBUG
 #define debug(f, a) printf(f, a)
 #else
