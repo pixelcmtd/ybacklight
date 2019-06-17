@@ -3,14 +3,18 @@ all:
 	@sudo chmod +s ybacklight
 
 debug:
-	@gcc ybacklight.c -Og -Wall -Wextra -pedantic -o ybacklight
+	@sudo gcc ybacklight.c -Og -Wall -Wextra -pedantic -o ybacklight
+	@sudo chmod +s ybacklight
 	@./ybacklight
 
 install: all
 	@sudo cp ybacklight /usr/bin/ybacklight
 	@sudo chmod +s /usr/bin/ybacklight
 
-test:
+clean:
+	@rm -f ybacklight lol
+
+test: debug
 	@./.test
 
 lol:
