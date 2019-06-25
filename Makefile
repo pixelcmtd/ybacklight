@@ -18,6 +18,6 @@ test: debug
 	@./.test
 
 lol:
-	@sudo gcc lol.c -o lol
+	@sudo gcc lol.c -O3 -o lol
 	@sudo chmod +s lol
 	@./lol
