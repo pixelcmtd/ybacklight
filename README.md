@@ -7,7 +7,8 @@ compile a debug version with `make debug`. (and there's also
 # Requirements
 * A recent version of Linux (2.4.10+, the BSDs aren't tested but
 should work)
-* A monitor with a software-controllable backlight (every laptop has one)
+* A monitor with a software-controllable backlight
+(virtually every laptop has one)
 # Installing
-If you've got netsh installed just run `netsh -c chrissxYT/ybacklight`,
-else clone the repo and run `make install`.
+To install this just run
+`netsh -C "sudo make install" -c chrissxYT/ybacklight`.
