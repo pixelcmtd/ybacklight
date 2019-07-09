@@ -7,17 +7,15 @@
 #include <errno.h>
 #define parsenum(bfr) (strtol((bfr), 0, 10))
 #define isnum(c) ((c) >= '0' && (c) <= '9')
+#define die(msg1, msg2) printf(msg1, msg2), exit(1);
 #if DEBUG
 #define debug(f, a) printf(f, a)
 #else
 #define debug(f, a)
 #endif
-
-void die(char *msg1, char *msg2)
-{
-	printf(msg1, msg2);
-	exit(1);
-}
+#ifndef bool
+typedef int bool;
+#endif
 
 long br_read(char *fname)
 {
@@ -42,50 +40,47 @@ void write_brightness(long i)
 }
 
 #ifndef YBACKLIGHT_LIB
-#ifndef bool
-typedef int bool;
-#endif
-void run(char cmd, bool *S, long *cur, long *max, long arg, bool *w)
+bool S = 0, w = 0;
+void run(char cmd, long *cur, long *max, long arg)
 {
 	debug("Cmd: %c; ", cmd);
 	debug("Short: %d\n", *S);
 	switch(cmd)
 	{
-		case 'c': printf("%ld", *S ? *cur / SHORT_FACTOR : *cur); *w = 1; break;
-		case 'm': printf("%ld", *S ? *max / SHORT_FACTOR : *max); *w = 1; break;
-		case 'S': *S = 1; return;
-		case 'i': *cur += *S ? arg * SHORT_FACTOR : arg; break;
-		case 'd': *cur -= *S ? arg * SHORT_FACTOR : arg; break;
-		case 's': *cur  = *S ? arg * SHORT_FACTOR : arg; break;
-		default:  putchar(cmd); *w = 1; break;
+		case 'c': printf("%ld", S ? *cur / SHORT_FACTOR : *cur); w = 1; break;
+		case 'm': printf("%ld", S ? *max / SHORT_FACTOR : *max); w = 1; break;
+		case 'S': S = 1; return;
+		case 'i': *cur += S ? arg * SHORT_FACTOR : arg; break;
+		case 'd': *cur -= S ? arg * SHORT_FACTOR : arg; break;
+		case 's': *cur  = S ? arg * SHORT_FACTOR : arg; break;
+		default:  putchar(cmd); w = 1; break;
 	}
-	*S = 0;
+	S = 0;
 }
 int main(int argc, char **argv)
 {
 	long cur = br_read(BRIGHTNESS);
 	long max = br_read(MAX_BRIGHTNESS);
-	char c, numbuf[NUM_MAX], q /*queued*/ = 0;
+	char c, buf[NUM_MAX], q /*queued*/ = 0;
 	long a = -1;
-	bool S = 0, w = 0;
-	memset(numbuf, 0, NUM_MAX);
+	memset(buf, 0, NUM_MAX);
 	for(int i = 1; i < argc; i++)
 	{
 		char *cp = argv[i];
 		while((c = *cp++))
-			if(isnum(c)) numbuf[strlen(numbuf)] = c;
+			if(isnum(c)) buf[strlen(buf)] = c;
 			else
 			{
-				if(*numbuf)
-					a = parsenum(numbuf),
-					memset(numbuf, 0, NUM_MAX);
-				if(q) run(q, &S, &cur, &max, a, &w), q = 0;
+				if(*buf) a = parsenum(buf),
+					 memset(buf, 0, NUM_MAX);
+				if(q) run(q, &cur, &max, a),
+                                      q = 0;
 				if((c == 's' || c == 'd' || c == 'i')
 				   && isnum(*(cp + 1))) q = c;
-				else run(c, &S, &cur, &max, a, &w);
+				else run(c, &cur, &max, a);
 			}
 	}
-	if(strlen(numbuf) && q) run(q, &S, &cur, &max, parsenum(numbuf), &w);
+	if(strlen(buf) && q) run(q, &cur, &max, parsenum(buf));
 	if(w) putchar('\n');
 	write_brightness(cur);
 	return 0;
