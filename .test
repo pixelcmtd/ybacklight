@@ -2,7 +2,7 @@
 ./ybacklight Sc/Sm
 PREV=$(./ybacklight c)
 MAX=$(./ybacklight m)
-echo "500/$MAX (s500)"
+echo "500/$MAX (Ss5)"
 sudo ./ybacklight s500
 sleep 1
 echo "700/$MAX (i200)"

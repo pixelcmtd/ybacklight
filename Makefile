@@ -5,7 +5,6 @@ all:
 debug:
 	@gcc ybacklight.c -Og -Wall -Wextra -pedantic -o ybacklight
 	@chmod +s ybacklight
-	@./ybacklight
 
 install: all
 	@cp ybacklight /usr/bin/ybacklight
