@@ -3,11 +3,12 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define YBACKLIGHT_LIB
+#include <unistd.h>
+#include "config.h"
 #include "ybacklight.c"
 
 int main()
 {
-	srand(time(0));
-	while(1) write_brightness(rand() % MAX), usleep(10000);
+        if(getuid() && setuid(0)) die("setuid(0) in lol: %s\n");
+	while(1) write_brightness(BRIGHTNESS, rand() % MAX), usleep(100000);
 }

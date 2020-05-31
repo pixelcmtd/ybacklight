@@ -1,89 +1,32 @@
 #define DEBUG 0
 #define NUM_MAX 16
-#include "config.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#define isnum(c) ((c) >= '0' && (c) <= '9')
-#define die(msg1, msg2) printf(msg1, msg2), exit(1);
-#if DEBUG
-#define debug(f, a) printf(f, a)
-#else
-#define debug(f, a)
-#endif
-#ifndef bool
-typedef int bool;
-#endif
+#define die(msg) printf(msg, strerror(errno)), exit(1);
 
 long read_brightness(char *fname)
 {
 	char bfr[NUM_MAX];
 	FILE *f = fopen(fname, "r");
+        if(!f) die("fopen: %s\n");
 	bfr[fread(bfr, 1, NUM_MAX, f) - 1] = '\0';
 	fclose(f);
 	return strtol(bfr, 0, 10);
 }
 
-void write_brightness(long i)
+void write_brightness(char *fname, long i)
 {
 	char bfr[NUM_MAX];
 	size_t cnt = sprintf(bfr, "%ld\n", i);
 	uid_t uid = getuid();
-	if(setuid(0)) die("Can't set UID: %s\n", strerror(errno));
-	FILE *f = fopen(BRIGHTNESS, "w");
-	if(!f) die("Can't open file: %s\n", strerror(errno));
+	if(uid && setuid(0)) die("setuid(0): %s\n");
+	FILE *f = fopen(fname, "w");
+	if(!f) die("fopen: %s\n");
 	fwrite(bfr, 1, cnt, f);
 	fclose(f);
-	if(setuid(uid)) die("Can't set UID: %s\n", strerror(errno));
+	if(uid && setuid(uid)) die("setuid(uid): %s\n");
 }
-
-#ifndef YBACKLIGHT_LIB
-bool S = 0, w = 0, f = 0;
-void run(char cmd, long *cur, long *max, long arg)
-{
-	debug("Cmd: %c; ", cmd);
-	debug("Short: %d\n", *S);
-	switch(cmd)
-	{
-		case 'c': printf("%ld", S ? *cur / SHORT_FACTOR : *cur); w = 1; break;
-		case 'm': printf("%ld", S ? *max / SHORT_FACTOR : *max); w = 1; break;
-		case 'S': S = 1; return;
-		case 'i': *cur += S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		case 'd': *cur -= S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		case 's': *cur  = S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		default:  putchar(cmd); w = 1; break;
-	}
-	S = 0;
-}
-int main(int argc, char **argv)
-{
-	long cur = read_brightness(BRIGHTNESS);
-	long max = read_brightness(MAX_BRIGHTNESS);
-	char c, buf[NUM_MAX], q /*queued*/ = 0;
-	long a = -1;
-	memset(buf, 0, NUM_MAX);
-	for(int i = 1; i < argc; i++)
-	{
-		char *cp = argv[i];
-		while((c = *cp++))
-			if(isnum(c)) buf[strlen(buf)] = c;
-			else
-			{
-				if(*buf) a = strtol(buf, 0, 10),
-					 memset(buf, 0, NUM_MAX);
-				if(q) run(q, &cur, &max, a),
-                                      q = 0;
-				if((c == 's' || c == 'd' || c == 'i')
-				   && isnum(*(cp + 1))) q = c;
-				else run(c, &cur, &max, a);
-			}
-	}
-	if(strlen(buf) && q) run(q, &cur, &max, strtol(buf, 0, 10));
-	if(w) putchar('\n');
-	if(f) write_brightness(cur);
-	return 0;
-}
-#endif

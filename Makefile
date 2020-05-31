@@ -1,9 +1,9 @@
 all:
-	@sudo gcc ybacklight.c -O3 -s -o ybacklight
+	@sudo gcc main.c -O3 -s -o ybacklight
 	@sudo chmod +s ybacklight
 
 debug:
-	@gcc ybacklight.c -Og -Wall -Wextra -pedantic -o ybacklight
+	@gcc main.c -Og -Wall -Wextra -pedantic -o ybacklight
 	@chmod +s ybacklight
 
 install: all
@@ -19,4 +19,6 @@ test: debug
 lol:
 	@sudo gcc lol.c -O3 -o lol
 	@sudo chmod +s lol
-	@./lol
+	@sudo ./lol
+
+.PHONY: all lol clean test debug install
