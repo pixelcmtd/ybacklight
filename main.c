@@ -7,6 +7,7 @@
 #else
 #define debug(f, a)
 #endif
+#include <unistd.h>
 
 int S = 0, w = 0, f = 0;
 void run(char cmd, long *cur, long *max, long arg)
@@ -28,6 +29,11 @@ void run(char cmd, long *cur, long *max, long arg)
 
 int main(int argc, char **argv)
 {
+#ifdef __OPENBSD__
+        if(pledge("stdio unveil")) die("pledge: %s\n");
+        if(unveil(BACKLIGHT, "rw")) die("unveil: %s\n");
+        if(unveil(NULL, NULL)) die("unveil: %s\n");
+#endif
 	long cur = read_brightness(BRIGHTNESS);
 	long max = read_brightness(MAX_BRIGHTNESS);
 	char c, buf[NUM_MAX], q /*queued*/ = '\0';
