@@ -1,24 +1,25 @@
-all:
-	@sudo gcc main.c -O3 -s -o ybacklight
-	@sudo chmod +s ybacklight
+CC ?= cc
+CFLAGS ?= -O3 -s -Wall -Wextra -pedantic
+PREFIX ?= /usr/local
 
-debug:
-	@gcc main.c -Og -Wall -Wextra -pedantic -o ybacklight
-	@chmod +s ybacklight
+all: ybacklight
+
+ybacklight: ybacklight.c main.c config.h
+	$(CC) main.c $(CFLAGS) -o ybacklight
+	chmod 4755 ybacklight
 
 install: all
-	@cp ybacklight /usr/bin/ybacklight
-	@chmod +s /usr/bin/ybacklight
+	install -d $(PREFIX)/bin
+	install -m 4755 ybacklight $(PREFIX)/bin/ybacklight
 
 clean:
-	@rm -f ybacklight lol
+	rm -f ybacklight lol
 
-test: debug
-	@./.test
+test: all
+	@./test.sh
 
-lol:
-	@sudo gcc lol.c -O3 -o lol
-	@sudo chmod +s lol
-	@sudo ./lol
+lol: ybacklight.c lol.c config.h
+	$(CC) lol.c $(CFLAGS) -o lol
+	chmod 4755 lol
 
-.PHONY: all lol clean test debug install
+.PHONY: all clean test install
