@@ -1,14 +1,20 @@
 # ybacklight
-A complete "rewrite" of xbacklight that actually works.
+
+A simpler alternative to `xbacklight`.
+
 # Building & Debugging
-You can build normally with `make`, test with `make test` or just
-compile a debug version with `make debug`. (and there's also
-`make lol`, which you should avoid)
+
+* Configure in `config.h`
+* Build: `make`
+* Test: `make test`
+* Install: `make install`
+* Build with debugging support: `CFLAGS="-Og -g" make`
+
 # Requirements
-* A recent version of Linux (2.4.10+, the BSDs aren't tested but
-should work)
-* A monitor with a software-controllable backlight
-(virtually every laptop has one)
+
+* Linux 2.4.10+ (or another `sysfs` compatible OS)
+* A monitor with a software-controllable backlight (practically a laptop)
+
 # Installing
-To install this just run
-`netsh -C "sudo make install" -c chrissxYT/ybacklight`.
+
+`netsh -C "sudo make install" -c pixelcmtd/ybacklight`
