@@ -8,49 +8,51 @@
 #define debug(f, a)
 #endif
 
+// TODO: support for something like an `x` instruction that switches to hex
+
 int S = 0, w = 0, f = 0;
-void run(char cmd, long long *cur, long long *max, long long arg)
+long long A, C, M;
+void run(char cmd)
 {
-	debug("Cmd: %c; ", cmd);
-	debug("Short: %d\n", *S);
-	switch(cmd)
-	{
-		case 'c': printf("%lld", S ? *cur / SHORT_FACTOR : *cur); w = 1; break;
-		case 'm': printf("%lld", S ? *max / SHORT_FACTOR : *max); w = 1; break;
-		case 'S': S = 1; return;
-		case 'i': *cur += S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		case 'd': *cur -= S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		case 's': *cur  = S ? arg * SHORT_FACTOR : arg; f = 1; break;
-		default:  putchar(cmd); w = 1; break;
-	}
-	S = 0;
+        debug("Cmd: %c; ", cmd);
+        debug("Short: %d\n", *S);
+        switch(cmd)
+        {
+                case 'c': printf("%lld", S ? C / SHORT_FACTOR : C); w = 1; break;
+                case 'm': printf("%lld", S ? M / SHORT_FACTOR : M); w = 1; break;
+                case 'S': S = 1; return;
+                case 'i': C += S ? A * SHORT_FACTOR : A; f = 1; break;
+                case 'd': C -= S ? A * SHORT_FACTOR : A; f = 1; break;
+                case 's': C  = S ? A * SHORT_FACTOR : A; f = 1; break;
+                default:  putchar(cmd); w = 1; break;
+        }
+        S = 0;
 }
 
 int main(int argc, char **argv)
 {
-        long long cur = read_brightness(BRIGHTNESS);
-        long long max = read_brightness(MAX_BRIGHTNESS);
-        char c, buf[NUM_MAX], q /*queued*/ = '\0';
-        long long a = -1;
-        memset(buf, 0, NUM_MAX);
+        C = read_brightness(BRIGHTNESS);
+        M = read_brightness(MAX_BRIGHTNESS);
+        char numbuf[NUM_MAX], queued = '\0';
+        memset(numbuf, 0, NUM_MAX);
         for(int i = 1; i < argc; i++)
         {
-                char *cp = argv[i];
+                char c, *cp = argv[i];
                 while((c = *cp++))
-                        if(isnum(c)) buf[strlen(buf)] = c;
+                        if(isnum(c)) numbuf[strlen(numbuf)] = c;
                         else
                         {
-                                if(*buf) a = strtoll(buf, 0, 10),
-                                        memset(buf, 0, NUM_MAX);
-                                if(q) run(q, &cur, &max, a),
-                                        q = 0;
+                                if(*numbuf) A = strtoll(numbuf, 0, 10),
+                                            memset(numbuf, 0, NUM_MAX);
+                                if(queued) run(queued),
+                                           queued = '\0';
                                 if((c == 's' || c == 'd' || c == 'i')
-                                                && isnum(*(cp + 1))) q = c;
-                                else run(c, &cur, &max, a);
+                                                && isnum(*(cp + 1))) queued = c;
+                                else run(c);
                         }
         }
-        if(strlen(buf) && q) run(q, &cur, &max, strtoll(buf, 0, 10));
+        if(strlen(numbuf) && queued) A = strtoll(numbuf, 0, 10), run(queued);
         if(w) putchar('\n');
-        if(f) write_brightness(BRIGHTNESS, cur);
+        if(f) write_brightness(BRIGHTNESS, C);
         return 0;
 }
