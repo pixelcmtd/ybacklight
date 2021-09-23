@@ -58,18 +58,5 @@ are divided/multiplied by `SHORT_FACTOR`, if the `S` register is set to `true`.
 
 ### Examples
 
-- Print short current brightness "/" short max brightness (e.g. `18/30`):
-
-`ybacklight Sc/Sm`
-
-- Set the brightness to 314:
-
-`ybacklight s314`
-
-- Increment the brightness by 1200:
-
-`ybacklight 12Si`
-
-- Decrement the brightness by 300:
-
-`ybacklight 300d`
+Examples have been merged into tldr (`tldr ybacklight`), so they are maintained
+[there](https://github.com/tldr-pages/tldr/blob/main/pages/common/ybacklight.md).
