@@ -3,12 +3,10 @@
 #include "ybacklight.c"
 #define isnum(c) ((c) >= '0' && (c) <= '9')
 #if DEBUG
-#define debug(f, a) printf(f, a)
+#define debug(f, a) fprintf(stderr, f, a)
 #else
 #define debug(f, a)
 #endif
-
-// TODO: support for something like an `x` instruction that switches to hex
 
 int S = 0, w = 0, f = 0;
 long long A, C, M;

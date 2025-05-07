@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#define die(msg) printf(msg ": %s\n", strerror(errno)), exit(1);
+#define die(msg) fprintf(stderr, msg ": %s\n", strerror(errno)), exit(1);
 
 long long read_brightness(char *fname)
 {
