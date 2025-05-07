@@ -23,6 +23,11 @@ A simpler alternative to `xbacklight`.
 
 ## Usage
 
+> [!NOTE]
+> If you just want to set your brightness without fully understanding everything
+> about the inner workings, consider reading `tldr ybacklight`, also available
+> [here](https://tldr.inbrowser.app/pages/common/ybacklight).
+
 `ybacklight [instruction-stream]`
 
 The `instruction-stream` contains a series of instructions.
@@ -55,11 +60,6 @@ interpreted first.
 You just need to understand one more constant: `SHORT_FACTOR` is defined in
 `config.h`, usually `100`. All reads/writes from/to the `C` and `M` registers
 are divided/multiplied by `SHORT_FACTOR`, if the `S` register is set to `true`.
-
-### Examples
-
-Examples have been merged into tldr (`tldr ybacklight`), so they are maintained
-[there](https://github.com/tldr-pages/tldr/blob/main/pages/common/ybacklight.md).
 
 ### Using `ybacklight` as a library
 
