@@ -20,13 +20,13 @@ long long read_brightness(char *fname)
 
 void write_brightness(char *fname, long long i)
 {
-	char bfr[NUM_MAX];
-	size_t cnt = sprintf(bfr, "%lld\n", i);
-	uid_t uid = getuid();
-	if(uid && setuid(0)) die("setuid(0)");
-	FILE *f = fopen(fname, "w");
-	if(!f) die("fopen");
-	fwrite(bfr, 1, cnt, f);
-	fclose(f);
-	if(uid && setuid(uid)) die("setuid(uid)");
+        char bfr[NUM_MAX];
+        size_t cnt = sprintf(bfr, "%lld\n", i);
+        uid_t uid = getuid();
+        if(uid && setuid(0)) die("setuid(0)");
+        FILE *f = fopen(fname, "w");
+        if(!f) die("fopen");
+        fwrite(bfr, 1, cnt, f);
+        fclose(f);
+        if(uid && setuid(uid)) die("setuid(uid)");
 }
